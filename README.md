@@ -15,6 +15,8 @@ Windows tray background tool for app-to-virtual-endpoint routing and stereo spat
   - no resampling between slot sample rates and output sample rate
   - undocumented routing APIs may be unavailable on some Windows builds (graceful `NotSupported` fallback)
   - overflow slot cannot pan per app independently
+ 
+For releases, installers are available under ["Releases"](https://github.com/nexxyz/WinPanX/releases/).
 
 ## Requirements
 - Windows 11
