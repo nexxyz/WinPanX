@@ -105,17 +105,16 @@ powershell -ExecutionPolicy Bypass -File .\scripts\Prepare-Release.ps1 -SkipSelf
 ```
 
 ## Project Docs
-- `ARCHITECTURE.md` - runtime architecture and constraints
-- `src\WinPanX.Agent\MANUAL.md` - user-facing manual
-- `CHANGELOG.md` - release history
-- `RELEASE_CHECKLIST.md` - release process checklist
-- `scripts\Prepare-Release.ps1` - one-shot release helper
-- `CONTRIBUTING.md` - contribution workflow
-- `SECURITY.md` - security reporting policy
-- `LICENSE` - project license
+- [ARCHITECTURE.md](ARCHITECTURE.md) - runtime architecture and constraints
+- [MANUAL.md](src/WinPanX.Agent/MANUAL.md) - user-facing manual
+- [CHANGELOG.md](CHANGELOG.md) - release history
+- [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) - release process checklist
+- [Prepare-Release.ps1](scripts/Prepare-Release.ps1) - one-shot release helper
+- [CONTRIBUTING.md](CONTRIBUTING.md) - contribution workflow
+- [SECURITY.md](SECURITY.md) - security reporting policy
+- [LICENSE](LICENSE) - project license
 
 List active render devices and endpoint IDs:
 ```powershell
 dotnet run --project .\src\WinPanX.Agent\WinPanX.Agent.csproj -- --list-render-devices
 ```
-
