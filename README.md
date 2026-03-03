@@ -36,6 +36,7 @@ dotnet build .\WinPanX.sln -c Debug
 dotnet run --project .\src\WinPanX.Agent\WinPanX.Agent.csproj
 ```
 If you're not building it, just use the installer and configure "Run on startup".
+
 The app starts in the system tray.
 The process exits at startup if the required virtual endpoints are not found or output resolves to a virtual slot endpoint (fail-fast by design).
 
