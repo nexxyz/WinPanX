@@ -1,0 +1,30 @@
+# Build outputs
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+coverage/
+
+# IDE/workspace
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Logs and diagnostics
+*.log
+*.trx
+*.coverage
+*.coveragexml
+
+# Package/cache/temp
+*.nupkg
+*.snupkg
+*.cache
+*.tmp
+*.temp
+
+# OS files
+Thumbs.db
+Desktop.ini

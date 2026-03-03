@@ -1,0 +1,16 @@
+﻿{
+  "SlotCount": 8,
+  "PollIntervalMs": 500,
+  "InactiveGraceSeconds": 3,
+  "VirtualEndpointNamePrefix": "Line ",
+  "OutputDeviceId": "default",
+  "ExcludedProcesses": [
+    "System",
+    "svchost"
+  ],
+  "ActivityPeakThreshold": 0.001,
+  "OverflowPanPolicy": "Center",
+  "TargetSampleRate": 48000,
+  "Channels": 2,
+  "FramesPerBuffer": 480
+}
