@@ -20,10 +20,10 @@ For releases, installers are available under ["Releases"](https://github.com/nex
 
 ## Requirements
 - Windows 11
-- .NET 10 SDK (required to build `net10.0-windows` project)
 - 8 pre-existing virtual stereo render endpoints that share a name prefix
   - example: `Line 1 (Virtual Audio Cable)` .. `Line 8 (Virtual Audio Cable)` with `VirtualEndpointNamePrefix = "Line "`
   - example: `WinPanX Slot 01` .. `WinPanX Slot 08` with `VirtualEndpointNamePrefix = "WinPanX Slot "`
+- If you want to build: .NET 10 SDK (required to build `net10.0-windows` project)
 
 ## Build
 ```powershell
