@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -151,16 +151,12 @@ internal sealed class WinPanXTrayContext : ApplicationContext
         {
             var config = WinPanXConfigLoader.LoadOrCreateDefault(_configPath);
             IAppTracker appTracker = new CoreAudioAppTracker(config);
-            IEndpointCatalog endpointCatalog = new CoreAudioEndpointCatalog();
-            IRouter router = new AudioPolicyRouter();
-            IMixer mixer = new WasapiMixer();
+            var panController = new SessionChannelPanController();
 
             await using var runtime = new RuntimeCoordinator(
                 config,
                 appTracker,
-                endpointCatalog,
-                router,
-                mixer);
+                panController);
 
             SimpleLog.Info("Starting WinPanX.");
             await runtime.RunAsync(cancellationToken);
@@ -454,3 +450,5 @@ internal sealed class WinPanXTrayContext : ApplicationContext
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     private static extern int SHOpenWithDialog(IntPtr hwndParent, ref OpenAsInfo info);
 }
+
+

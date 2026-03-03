@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Assets\WinPanX.ico</ApplicationIcon>
     <AssemblyTitle>WinPan X Agent</AssemblyTitle>
-    <Description>Tray background tool for per-process endpoint routing and stereo pan mixing.</Description>
+    <Description>Tray background tool for per-process stereo panning based on window position.</Description>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
@@ -31,4 +31,5 @@
     <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 </Project>
+
 

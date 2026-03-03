@@ -1,7 +1,6 @@
 # Release Checklist
 
 ## 1. Prepare
-
 - [ ] Clean generated outputs (`artifacts/`, `bin/`, `obj/`) from working tree.
 - [ ] Update `Directory.Build.props` version fields.
 - [ ] Update `CHANGELOG.md`:
@@ -9,7 +8,6 @@
   - [ ] Add a fresh empty `Unreleased` section.
 
 ## 2. Validate
-
 - [ ] Restore and build:
 
 ```powershell
@@ -22,10 +20,9 @@ dotnet build .\WinPanX.sln -c Release
   - [ ] Routing toggle works.
   - [ ] Run-on-startup toggle works.
   - [ ] Open manual/config/log menu items work.
-  - [ ] Exit resets routed apps to system default.
+  - [ ] Exit restores modified session channel volumes.
 
 ## 3. Package
-
 - [ ] Optional one-shot path:
 
 ```powershell
@@ -50,7 +47,6 @@ powershell -ExecutionPolicy Bypass -File .\installer\Build-Installer.ps1 -SelfCo
 - [ ] Verify installer metadata and icon in file properties.
 
 ## 4. Publish
-
 - [ ] Tag release (`vX.Y.Z`).
 - [ ] Create GitHub release notes from `CHANGELOG.md`.
 - [ ] Attach installer artifacts:

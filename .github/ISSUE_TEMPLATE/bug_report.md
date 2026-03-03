@@ -15,7 +15,7 @@ Describe the issue clearly.
 - WinPan X version:
 - Install type: FD installer / SC installer / local run
 - Windows version:
-- Virtual endpoint driver/version:
+- Audio endpoint / app details (if relevant):
 
 ## Steps To Reproduce
 
@@ -38,3 +38,4 @@ Attach relevant lines from `winpanx.log`.
 ## Additional Context
 
 Anything else that might help diagnose the issue.
+

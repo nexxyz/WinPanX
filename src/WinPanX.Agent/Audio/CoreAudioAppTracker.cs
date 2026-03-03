@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
@@ -17,6 +17,8 @@ internal sealed class CoreAudioAppTracker : IAppTracker
     private const int ChildidSelf = 0;
     private const uint WineventOutofcontext = 0x0000;
     private const uint WineventSkipownprocess = 0x0002;
+    private const uint Th32csSnapprocess = 0x00000002;
+    private static readonly IntPtr InvalidHandleValue = new(-1);
 
     private readonly object _sync = new();
     private readonly HashSet<string> _excludedProcessNames;
@@ -188,6 +190,8 @@ internal sealed class CoreAudioAppTracker : IAppTracker
     {
         var aggregates = new Dictionary<AppRuntimeId, AppAggregate>();
         var processInfoCache = new Dictionary<int, ProcessInfo?>();
+        // Browser/Chromium audio often comes from child processes without windows; keep a parent map for fallback lookup.
+        var parentPidByPid = BuildParentPidMap();
 
         var devices = _enumerator!.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
         foreach (var device in devices)
@@ -230,7 +234,11 @@ internal sealed class CoreAudioAppTracker : IAppTracker
 
                     if (!aggregates.TryGetValue(appId, out var aggregate))
                     {
-                        var (hasWindow, rect, pan, hwnd) = ResolveWindowAndPan(processInfo, appId);
+                        var (hasWindow, rect, pan, hwnd) = ResolveWindowAndPan(
+                            processInfo,
+                            appId,
+                            processInfoCache,
+                            parentPidByPid);
                         aggregate = new AppAggregate(
                             AppId: appId,
                             ProcessName: processInfo.ProcessName,
@@ -322,7 +330,9 @@ internal sealed class CoreAudioAppTracker : IAppTracker
 
     private (bool HasWindow, WindowRect? Rect, float Pan, IntPtr WindowHandle) ResolveWindowAndPan(
         ProcessInfo processInfo,
-        AppRuntimeId appId)
+        AppRuntimeId appId,
+        Dictionary<int, ProcessInfo?> processInfoCache,
+        IReadOnlyDictionary<int, int> parentPidByPid)
     {
         if (_states.TryGetValue(appId, out var tracked)
             && tracked.PinnedWindowHandle != IntPtr.Zero)
@@ -345,7 +355,93 @@ internal sealed class CoreAudioAppTracker : IAppTracker
             return (true, observed.Rect, ComputePan(observed.Rect.CenterX), observed.Hwnd);
         }
 
+        if (TryResolveAncestorWindowObservation(
+                processInfo.ProcessId,
+                processInfoCache,
+                parentPidByPid,
+                out var ancestor))
+        {
+            return (true, ancestor.Rect, ComputePan(ancestor.Rect.CenterX), ancestor.Hwnd);
+        }
+
         return (false, null, 0.0f, IntPtr.Zero);
+    }
+
+    private bool TryResolveAncestorWindowObservation(
+        int processId,
+        Dictionary<int, ProcessInfo?> processInfoCache,
+        IReadOnlyDictionary<int, int> parentPidByPid,
+        out WindowObservation observation)
+    {
+        observation = default!;
+        var visited = new HashSet<int> { processId };
+        var currentPid = processId;
+
+        for (var depth = 0; depth < 8; depth++)
+        {
+            if (!parentPidByPid.TryGetValue(currentPid, out var parentPid) || parentPid <= 0 || !visited.Add(parentPid))
+            {
+                return false;
+            }
+
+            if (!processInfoCache.TryGetValue(parentPid, out var parentInfo))
+            {
+                parentInfo = TryGetProcessInfo(parentPid);
+                processInfoCache[parentPid] = parentInfo;
+            }
+
+            if (parentInfo is not null)
+            {
+                if (TryGetWindowObservation(parentInfo.MainWindowHandle, parentInfo.ProcessId, out observation))
+                {
+                    return true;
+                }
+
+                if (TryGetMostRecentObservedWindow(parentInfo.ProcessId, out observation))
+                {
+                    return true;
+                }
+            }
+
+            currentPid = parentPid;
+        }
+
+        return false;
+    }
+
+    private static Dictionary<int, int> BuildParentPidMap()
+    {
+        var result = new Dictionary<int, int>();
+        var snapshot = CreateToolhelp32Snapshot(Th32csSnapprocess, 0);
+        if (snapshot == InvalidHandleValue)
+        {
+            return result;
+        }
+
+        try
+        {
+            var entry = new ProcessEntry32
+            {
+                DwSize = (uint)Marshal.SizeOf<ProcessEntry32>()
+            };
+
+            if (!Process32First(snapshot, ref entry))
+            {
+                return result;
+            }
+
+            do
+            {
+                result[(int)entry.Th32ProcessID] = (int)entry.Th32ParentProcessID;
+                entry.DwSize = (uint)Marshal.SizeOf<ProcessEntry32>();
+            } while (Process32Next(snapshot, ref entry));
+        }
+        finally
+        {
+            _ = CloseHandle(snapshot);
+        }
+
+        return result;
     }
 
     private void RegisterWindowHook()
@@ -567,6 +663,18 @@ internal sealed class CoreAudioAppTracker : IAppTracker
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool GetWindowRect(IntPtr hWnd, out NativeRect lpRect);
 
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr CreateToolhelp32Snapshot(uint dwFlags, uint th32ProcessId);
+
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    private static extern bool Process32First(IntPtr hSnapshot, ref ProcessEntry32 lppe);
+
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    private static extern bool Process32Next(IntPtr hSnapshot, ref ProcessEntry32 lppe);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool CloseHandle(IntPtr hObject);
+
     [DllImport("user32.dll")]
     private static extern int GetSystemMetrics(int nIndex);
 
@@ -577,6 +685,23 @@ internal sealed class CoreAudioAppTracker : IAppTracker
         public int Top;
         public int Right;
         public int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    private struct ProcessEntry32
+    {
+        public uint DwSize;
+        public uint CntUsage;
+        public uint Th32ProcessID;
+        public IntPtr Th32DefaultHeapID;
+        public uint Th32ModuleID;
+        public uint CntThreads;
+        public uint Th32ParentProcessID;
+        public int PcPriClassBase;
+        public uint DwFlags;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        public string SzExeFile;
     }
 
     private sealed record ProcessInfo(int ProcessId, string ProcessName, DateTime ProcessStartTimeUtc, IntPtr MainWindowHandle);
@@ -622,8 +747,7 @@ internal sealed class CoreAudioAppTracker : IAppTracker
                 LastAudioUtc,
                 HasWindow,
                 WindowRect,
-                Pan,
-                AssignedSlotIndex: null);
+                Pan);
         }
     }
 
@@ -657,4 +781,6 @@ internal sealed class CoreAudioAppTracker : IAppTracker
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool IsWindowVisible(IntPtr hWnd);
 }
+
+
 

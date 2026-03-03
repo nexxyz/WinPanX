@@ -1,29 +1,37 @@
-﻿# WinPanX Manual
+# WinPanX Manual
 
-## What It Does
-- Detects apps that are currently producing audio.
-- Routes each app to one of the configured virtual endpoints.
-- Tracks a selected app window and computes horizontal pan from that window position.
-- Mixes all virtual endpoints to one real output device.
+## What it does
+- Detects apps currently producing audio.
+- Tracks app window horizontal position.
+- Pans each compatible app session left/right in real time.
+- Restores original session channel volumes when disabled or exited.
 
-## Tray Menu
-- `Routing enabled` / `Routing disabled`: toggles audio routing/mixing on or off without exiting the app.
-- `Run on startup`: toggles launching WinPanX at user sign-in.
-- `Open manual`: opens this file with the OS default/open mechanism.
-- `Open config`: opens `winpanx.json`.
-- `Open log`: opens `winpanx.log`.
-- `Exit`: shuts down gracefully and resets app routing back to system default.
+## Tray menu
+- `Routing enabled` / `Routing disabled`: enable or disable panning without exiting.
+- `Run on startup`: toggle launch at sign-in.
+- `Open manual`: open this file.
+- `Open config`: open active `winpanx.json`.
+- `Open log`: open `winpanx.log`.
+- `Exit`: graceful shutdown with channel-volume restore.
 
-## Config Location
-- Default: `%LocalAppData%\WinPanX\winpanx.json`.
-- You can pass a custom config path as first argument.
+## Config path
+- Default: `%LocalAppData%\WinPanX\winpanx.json`
+- Custom: pass config path as first argument
 
-## Log Location
-- `winpanx.log` in the same directory as the active config file (default `%LocalAppData%\WinPanX`).
+## Config keys
+```json
+{
+  "PollIntervalMs": 500,
+  "InactiveGraceSeconds": 3,
+  "ExcludedProcesses": ["System", "svchost", "WinPanX.Agent"],
+  "ActivityPeakThreshold": 0.001
+}
+```
+
+## Log path
+- Same folder as active config file.
 
 ## Notes
-- If output resolves to one of the virtual slot endpoints, startup fails fast.
-- Overflow slot (`8`) is shared; per-app panning inside overflow is not available in MVP.
-- Slot/output sample rates must match in this MVP (no resampling stage).
-- Installer builds are available as framework-dependent (smaller) and self-contained (larger).
-
+- No virtual audio endpoints are required.
+- Some apps cannot be panned if their session does not expose channel-volume control.
+- Browser tabs may sometimes map to parent-process windows rather than exact tab window context.

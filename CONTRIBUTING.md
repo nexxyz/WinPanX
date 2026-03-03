@@ -1,46 +1,37 @@
 # Contributing
 
 ## Scope
-
-WinPan X is a Windows-only audio routing/mixing utility. Contributions should
-prioritize reliability, low-latency behavior, and predictable runtime behavior.
+WinPan X is a Windows-only per-app stereo panning utility.
+Contributions should prioritize reliability, low-latency updates, and predictable restore behavior.
 
 ## Prerequisites
-
 - Windows 11
 - .NET 10 SDK
-- 8 virtual stereo render endpoints (for runtime validation/testing)
 
-## Local Setup
-
+## Local setup
 ```powershell
 dotnet restore .\WinPanX.sln
 dotnet build .\WinPanX.sln -c Debug
 ```
 
-## Development Rules
+## Development rules
+- Keep callback/event paths allocation-light and non-blocking.
+- Prefer explicit logs for session/window/pan failures.
+- Preserve graceful restore behavior when runtime stops.
+- Keep config backward compatible when practical.
 
-- Keep audio callback paths allocation-light and non-blocking.
-- Prefer explicit logging for runtime/device/routing failures.
-- Preserve fail-fast startup behavior for invalid endpoint/output topology.
-- Keep config backward compatible when possible.
-
-## Pull Request Guidelines
-
-- Keep PRs focused and scoped.
-- Update `README.md`, `MANUAL.md`, and `ARCHITECTURE.md` when behavior changes.
-- Add or update `CHANGELOG.md` entries under `Unreleased`.
-- Ensure local build passes:
+## Pull request guidelines
+- Keep PRs focused.
+- Update `README.md`, `MANUAL.md`, and `ARCHITECTURE.md` for behavior changes.
+- Update `CHANGELOG.md` under `Unreleased`.
+- Ensure local release build passes:
 
 ```powershell
 dotnet build .\WinPanX.sln -c Release
 ```
 
-## Release Versioning
-
-Version metadata is centralized in `Directory.Build.props`.
-Before release, update:
-
+## Release versioning
+Version metadata is centralized in `Directory.Build.props`:
 - `Version`
 - `AssemblyVersion`
 - `FileVersion`
