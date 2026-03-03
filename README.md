@@ -1,4 +1,4 @@
-﻿# WinPanX
+﻿# WinPan X
 
 Windows tray background tool for app-to-virtual-endpoint routing and stereo spatial mixing.
 
