@@ -150,6 +150,7 @@ internal sealed class WinPanXTrayContext : ApplicationContext
         try
         {
             var config = WinPanXConfigLoader.LoadOrCreateDefault(_configPath);
+            SimpleLog.PruneOlderThanDays(config.LogRetentionDays);
             IAppTracker appTracker = new CoreAudioAppTracker(config);
             var panController = new SessionChannelPanController();
 
@@ -450,5 +451,7 @@ internal sealed class WinPanXTrayContext : ApplicationContext
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     private static extern int SHOpenWithDialog(IntPtr hwndParent, ref OpenAsInfo info);
 }
+
+
 
 

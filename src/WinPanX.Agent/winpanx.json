@@ -1,6 +1,7 @@
 {
   "PollIntervalMs": 500,
   "InactiveGraceSeconds": 3,
+  "LogRetentionDays": 7,
   "ExcludedProcesses": [
     "System",
     "svchost",

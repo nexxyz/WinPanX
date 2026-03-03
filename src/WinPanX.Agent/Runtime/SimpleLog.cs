@@ -1,4 +1,6 @@
-﻿namespace WinPanX.Agent.Runtime;
+using System.Globalization;
+
+namespace WinPanX.Agent.Runtime;
 
 public static class SimpleLog
 {
@@ -34,6 +36,46 @@ public static class SimpleLog
         }
     }
 
+    // Removes log entries older than the configured retention period.
+    // Set retentionDays to 0 to disable pruning.
+    public static void PruneOlderThanDays(int retentionDays)
+    {
+        if (retentionDays <= 0)
+        {
+            return;
+        }
+
+        lock (Sync)
+        {
+            try
+            {
+                EnsureDirectoryExists(_logPath);
+                if (!File.Exists(_logPath))
+                {
+                    File.WriteAllText(_logPath, string.Empty);
+                    return;
+                }
+
+                var cutoffUtc = DateTime.UtcNow.AddDays(-retentionDays);
+                var keptLines = new List<string>();
+
+                foreach (var line in File.ReadLines(_logPath))
+                {
+                    if (!TryParseLineTimestampUtc(line, out var timestampUtc) || timestampUtc >= cutoffUtc)
+                    {
+                        keptLines.Add(line);
+                    }
+                }
+
+                File.WriteAllLines(_logPath, keptLines);
+            }
+            catch
+            {
+                // Logging must never crash the agent.
+            }
+        }
+    }
+
     public static void Info(string message) => Write("INFO", message);
 
     public static void Warn(string message) => Write("WARN", message);
@@ -57,6 +99,34 @@ public static class SimpleLog
         }
     }
 
+    private static bool TryParseLineTimestampUtc(string line, out DateTime timestampUtc)
+    {
+        timestampUtc = DateTime.MinValue;
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            return false;
+        }
+
+        var separatorIndex = line.IndexOf(' ');
+        if (separatorIndex <= 0)
+        {
+            return false;
+        }
+
+        var token = line[..separatorIndex];
+        if (!DateTime.TryParse(
+                token,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal,
+                out var parsed))
+        {
+            return false;
+        }
+
+        timestampUtc = parsed.ToUniversalTime();
+        return true;
+    }
+
     private static void EnsureDirectoryExists(string path)
     {
         var directory = Path.GetDirectoryName(path);
@@ -66,4 +136,3 @@ public static class SimpleLog
         }
     }
 }
-

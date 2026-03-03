@@ -23,10 +23,15 @@
 {
   "PollIntervalMs": 500,
   "InactiveGraceSeconds": 3,
+  "LogRetentionDays": 7,
   "ExcludedProcesses": ["System", "svchost", "WinPanX.Agent"],
   "ActivityPeakThreshold": 0.001
 }
 ```
+
+`LogRetentionDays` controls startup log cleanup:
+- `7` means keep the last 7 days (default).
+- `0` disables log pruning.
 
 ## Log path
 - Same folder as active config file.

@@ -6,6 +6,8 @@ public sealed class WinPanXConfig
 
     public int InactiveGraceSeconds { get; init; } = 3;
 
+    public int LogRetentionDays { get; init; } = 7;
+
     public string[] ExcludedProcesses { get; init; } = ["System", "svchost", "WinPanX.Agent"];
 
     public float ActivityPeakThreshold { get; init; } = 0.001f;
@@ -20,6 +22,11 @@ public sealed class WinPanXConfig
         if (InactiveGraceSeconds < 0)
         {
             throw new InvalidOperationException("InactiveGraceSeconds cannot be negative.");
+        }
+
+        if (LogRetentionDays < 0)
+        {
+            throw new InvalidOperationException("LogRetentionDays cannot be negative.");
         }
 
         if (ActivityPeakThreshold is < 0.0f or > 1.0f)
