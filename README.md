@@ -34,6 +34,7 @@ dotnet build .\WinPanX.sln -c Debug
 ## Run
 If you're not building it, just use the installer and configure "Run on startup".
 
+If you built the app yourself, use this to run/test it:
 ```powershell
 dotnet run --project .\src\WinPanX.Agent\WinPanX.Agent.csproj
 ```
