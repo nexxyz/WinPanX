@@ -55,6 +55,11 @@ Optional config path argument:
 dotnet run --project .\src\WinPanX.Agent\WinPanX.Agent.csproj -- C:\path\to\winpanx.json
 ```
 
+List active render devices and endpoint IDs:
+```powershell
+dotnet run --project .\src\WinPanX.Agent\WinPanX.Agent.csproj -- --list-render-devices
+```
+
 ## Installer (Inno Setup)
 Prerequisites:
 - Inno Setup 6 (`ISCC.exe` available on PATH or installed in default location)
@@ -113,8 +118,3 @@ powershell -ExecutionPolicy Bypass -File .\scripts\Prepare-Release.ps1 -SkipSelf
 - [CONTRIBUTING.md](CONTRIBUTING.md) - contribution workflow
 - [SECURITY.md](SECURITY.md) - security reporting policy
 - [LICENSE](LICENSE) - project license
-
-List active render devices and endpoint IDs:
-```powershell
-dotnet run --project .\src\WinPanX.Agent\WinPanX.Agent.csproj -- --list-render-devices
-```
