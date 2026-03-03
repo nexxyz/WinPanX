@@ -8,7 +8,7 @@
   #define BuildOutput "..\artifacts\publish\win-x64"
 #endif
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "0.50.0"
 #endif
 #ifndef InstallerSuffix
   #define InstallerSuffix ""
@@ -60,3 +60,4 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Parameters: """{localappdata}\WinPanX\winpanx.json"""; Description: "Launch WinPan X"; Flags: nowait postinstall skipifsilent unchecked
+

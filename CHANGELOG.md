@@ -7,12 +7,14 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.50.0] - 2026-03-03
+
 ### Changed
 - Replaced virtual-endpoint routing/mixing architecture with direct per-session channel panning.
 - Removed dependency on virtual audio endpoints for runtime operation.
 - Added ancestor-process window fallback for Chromium-family multi-process audio sessions.
 - Simplified configuration schema to tracking/panning-only keys.
-- Updated docs and release checklist for the new architecture.
+- Updated docs, manual, and release checklist for the new architecture.
 
 ### Removed
 - Legacy endpoint catalog, policy router, slot assignment, and WASAPI loopback mixer pipeline.
