@@ -1,3 +1,15 @@
+# This repository is obsolete
+
+This project has been replaced by:
+
+https://github.com/nexxyz/WinPanX.2
+
+WinPan X.2 is the maintained and improved successor.
+
+This repository is no longer maintained.
+
+---
+
 # WinPan X
 
 WinPan X is a Windows 11 tray app that pans each app's audio in stereo based on that app window's horizontal desktop position.
@@ -101,3 +113,4 @@ Center pan is unity gain (no attenuation).
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [SECURITY.md](SECURITY.md)
 - [LICENSE](LICENSE)
+
